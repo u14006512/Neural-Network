@@ -9,7 +9,7 @@ package cos_314_nn_project;
  *
  * @author Warmaster
  */
-public class COS_314_NN_Project {
+public class Experiment4 {
 
     /**
      * @param args the command line arguments
@@ -17,5 +17,5 @@ public class COS_314_NN_Project {
     public static void main(String[] args) {
         // TODO code application logic here
     }
-
+    
 }
