@@ -31,9 +31,13 @@ public class DataReader {
     ArrayList<DataRecord> validationSet;
 
     DataReader() {
-
+        sampleSet=new ArrayList<DataRecord>();
+        trainingSet=new ArrayList<DataRecord>();
+        generalisationSet=new ArrayList<DataRecord>();
+        validationSet=new ArrayList<DataRecord>();
     }
-
+    
+    
     void processLine(String inline) {
 
         String[] attributes = inline.split(",");
@@ -41,8 +45,8 @@ public class DataReader {
         String[] tmpPattern = new String[inputs];
         double[] tmpTarget = new double[targets];
 
-        for (int i = 0; i < inputs; i++) {
-            tmpPattern[i] = attributes[i];
+        for (int i = 1,j=0; i <=inputs; i++,j++) {
+            tmpPattern[j] = attributes[i];
         }
         double[] tmpTransform = new double[inputs];
 
@@ -54,7 +58,7 @@ public class DataReader {
 
         switch (experiment) {
             case 0:
-                if (tmpPattern[0].equals(seek) == true) {
+                if (attributes[0].equals(seek) == true) {
                     tmpTarget[0] = 1.0;
 
                 } else {
@@ -62,7 +66,7 @@ public class DataReader {
                 }
                 break;
             case 1:
-                if ((tmpPattern[0].equals("U")) || (tmpPattern[0].equals("O")) || (tmpPattern[0].equals("I")) || (tmpPattern[0].equals("E")) || (tmpPattern[0].equals("A"))) {
+                if ((attributes[0].equals("U")) || (attributes[0].equals("O")) || (attributes[0].equals("I")) || (attributes[0].equals("E")) || (attributes[0].equals("A"))){
                     tmpTarget[0] = 1.0;
 
                 } else {
@@ -96,7 +100,30 @@ public class DataReader {
 
             }
 
-            Collections.shuffle(sampleSet, r);
+
+            br.close();
+            /*
+            System.out.println("=========================================");
+            System.out.println("Source File: " + filename);
+            System.out.println("Data Records Loaded: " + sampleSet.size());
+            System.out.println("Training Set Size: " + trainingSet.size());
+            System.out.println("Generalisation Set Size: " + generalisationSet.size());
+            System.out.println("Validation Set Size: " + validationSet.size());
+            System.out.println("=========================================");
+            */
+            return true;
+        } else {
+            System.out.println("=========================================");
+            System.out.println("Source File: " + filename + " was not found!");
+            System.out.println("=========================================");
+            return false;
+        }
+    }
+    void reshuffleAndGenerateSets()
+    {
+            clearTrainingData();
+            Random r=new Random(System.currentTimeMillis());
+            //Collections.shuffle(sampleSet, r);
             int trainingSize, genSize, valSize;
 
             trainingSize = (int) (sampleSet.size() * 0.6);
@@ -110,7 +137,7 @@ public class DataReader {
                     tmpP[j] = sampleSet.get(i).pattern[j];
                 }
                 for (int j = 0; j < tmpT.length; j++) {
-                    tmpP[j] = sampleSet.get(i).target[j];
+                    tmpT[j] = sampleSet.get(i).target[j];
                 }
                 trainingSet.add(new DataRecord(inputs, targets, tmpP, tmpT));
             }
@@ -122,7 +149,7 @@ public class DataReader {
                     tmpP[j] = sampleSet.get(i).pattern[j];
                 }
                 for (int j = 0; j < tmpT.length; j++) {
-                    tmpP[j] = sampleSet.get(i).target[j];
+                    tmpT[j] = sampleSet.get(i).target[j];
                 }
                 generalisationSet.add(new DataRecord(inputs, targets, tmpP, tmpT));
             }
@@ -134,38 +161,28 @@ public class DataReader {
                     tmpP[j] = sampleSet.get(i).pattern[j];
                 }
                 for (int j = 0; j < tmpT.length; j++) {
-                    tmpP[j] = sampleSet.get(i).target[j];
+                    tmpT[j] = sampleSet.get(i).target[j];
                 }
                 validationSet.add(new DataRecord(inputs, targets, tmpP, tmpT));
             }
-
-            br.close();
-            System.out.println("=========================================");
-            System.out.println("Source File: " + filename);
-            System.out.println("Data Records Loaded: " + sampleSet.size());
-            System.out.println("Training Set Size: " + trainingSet.size());
-            System.out.println("Generalisation Set Size: " + generalisationSet.size());
-            System.out.println("Validation Set Size: " + validationSet.size());
-            System.out.println("=========================================");
-            return true;
-        } else {
-            System.out.println("=========================================");
-            System.out.println("Source File: " + filename + " was not found!");
-            System.out.println("=========================================");
-            return false;
-        }
     }
-
     void clearAllData() {
+        if ( trainingSet!=null && trainingSet.isEmpty()==false )
         trainingSet.clear();
+        if (generalisationSet!=null && generalisationSet.isEmpty()==false )
         generalisationSet.clear();
+        if ( validationSet!=null && validationSet.isEmpty()==false)
         validationSet.clear();
+        if (sampleSet!=null && sampleSet.isEmpty()==false)
         sampleSet.clear();
     }
 
     void clearTrainingData() {
+        if ( trainingSet!=null && trainingSet.isEmpty()==false )
         trainingSet.clear();
+        if (generalisationSet!=null && generalisationSet.isEmpty()==false )
         generalisationSet.clear();
+        if ( validationSet!=null && validationSet.isEmpty()==false)
         validationSet.clear();
     }
 

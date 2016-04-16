@@ -32,21 +32,24 @@ public class NetworkTrainer {
 
     void openLogReport(int logNumber) throws IOException {
 
-        logFile = new File(Integer.toString(logNumber) + ".txt");
+        logFile = new File("Logs\\"+Integer.toString(logNumber) + ".txt");
 
         logFile.createNewFile();
 
-        FileWriter fw = new FileWriter(logFile.getAbsoluteFile());
+        FileWriter fw = new FileWriter(logFile.getCanonicalFile());
         bw = new BufferedWriter(fw);
-
-        bw.write("Epoch" + '\t' + "Training Set Accuracy" + '\t' + "Generalisation Set Accuracy");
+        String heading="Epoch" + '\t' + "Training Set Accuracy" + '\t' + "Generalisation Set Accuracy";
+        bw.write(heading);
         bw.newLine();
-
+        bw.close();
     }
 
     void writeEpochLogData(String data) throws IOException {
+        FileWriter fw = new FileWriter(logFile.getCanonicalFile());
+        bw = new BufferedWriter(fw);
         bw.write(data);
         bw.newLine();
+        bw.close();
     }
 
     void closeLogReport() throws IOException {
@@ -55,10 +58,27 @@ public class NetworkTrainer {
         }
     }
 
-    void RunExperiment() {
-        int hiddenUnits=1;
+    void RunExperiment(String fn, int inputs, int targets, String search, int experiment) throws IOException {
+        DataReader dataInput = new DataReader();
         
         
+        int hiddenUnits = 10;
+        int i = 0;
+        int logNumber=0;
+        dataInput.loadFileExperiment(fn, inputs, targets, search, experiment);
+        while (i < 1) {
+            if (pokemon!=null) pokemon=null;
+            pokemon=new NeuralNetwork(16, hiddenUnits, 1, false);
+            dataInput.reshuffleAndGenerateSets();
+            trainNetwork(dataInput.trainingSet, dataInput.generalisationSet, dataInput.validationSet, logNumber);
+
+            if (hiddenUnits < 17) {
+                hiddenUnits = hiddenUnits + 1;
+            }
+           // pokemon.resetNetwork();
+            
+            i++;
+        }
     }
 
     void trainNetwork(ArrayList<DataRecord> trainingSet, ArrayList<DataRecord> generalisationSet, ArrayList<DataRecord> validationSet, int logNum) throws IOException {
@@ -78,7 +98,7 @@ public class NetworkTrainer {
 
         pokemon.setEpoch(0);
 
-        while ((pokemon.getTrainingSetAccuracy() < pokemon.getDesiredAccuracy() || pokemon.getGeneralisationSetAccuracy() < pokemon.getDesiredAccuracy()) && pokemon.getEpoch() < pokemon.getMaxEpochs()) {
+        while ((pokemon.getTrainingSetAccuracy() < pokemon.getDesiredAccuracy() && pokemon.getGeneralisationSetAccuracy() < pokemon.getDesiredAccuracy()) && pokemon.getEpoch() < pokemon.getMaxEpochs()) {
 
             double priorTrainingAcc = pokemon.getTrainingSetAccuracy();
             double priorGenAcc = pokemon.getGeneralisationSetAccuracy();
@@ -110,6 +130,8 @@ public class NetworkTrainer {
         pokemon.setValidationSetAccuracy(pokemon.getSetAccuracy(validationSet));
         pokemon.setValidationSetMeanSqError(pokemon.getSetMeanSqError(validationSet));
 
+        System.out.println("");
+        System.out.println("");
         System.out.println("===============================================================");
         System.out.println("Training Complete");
         System.out.println("Validation Set Accuracy:" + pokemon.getValidationSetAccuracy());

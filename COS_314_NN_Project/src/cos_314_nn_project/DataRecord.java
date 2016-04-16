@@ -19,8 +19,8 @@ public class DataRecord {
     }
 
     DataRecord(int inputs, int targets,double[] pattern,double[] targ) {
-        pattern = new double[inputs];
-        target = new double[targets];
+        this.pattern = new double[inputs];
+        this.target = new double[targets];
         setPattern(pattern);
         setTarget(targ);
     }

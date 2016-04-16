@@ -15,9 +15,9 @@ import java.util.ArrayList;
 public class NeuralNetwork {
 
     final double LEARNING_RATE_DEFAULT = 0.001;
-    final double MOMENTUM = 0.9;
+    final double MOMENTUM = 0.8;
     final long MAX_EPOCHS = 1500;
-    final long PREFERED_ACCURACY = 90;
+    final long PREFERED_ACCURACY = 100;
 
     ///LEARNING PARAMETERS
     double learningRate;
@@ -54,18 +54,18 @@ public class NeuralNetwork {
     double[][] weightsInputToHidden;
     double[][] weightsHiddenToOutput;
 
-    double getInN()
-    {
+    double getInN() {
         return inputNNum;
     }
-    double getHiddenN()
-    {
+
+    double getHiddenN() {
         return hiddenNNum;
     }
-    double getOutN()
-    {
+
+    double getOutN() {
         return outputNNum;
     }
+
     double getLearningRate() {
         return learningRate;
     }
@@ -109,10 +109,11 @@ public class NeuralNetwork {
     double getValidationSetMeanSqError() {
         return validationSetMeanSqError;
     }
-    void setHiddenUnits(int in)
-    {
-        this.hiddenNNum=in;
+
+    void setHiddenUnits(int in) {
+        this.hiddenNNum = in;
     }
+
     void setLearningRate(double in) {
         this.learningRate = in;
     }
@@ -200,13 +201,13 @@ public class NeuralNetwork {
         weightsInputToHidden = new double[inputNNum + 1][hiddenNNum];
         weightsHiddenToOutput = new double[hiddenNNum + 1][outputNNum];
 
-        for (int a = 0; a < inputNNum + 1; a++) {
+        for (int a = 0; a <=inputNNum; a++) {
             for (int b = 0; b < hiddenNNum; b++) {
                 weightsInputToHidden[a][b] = 0;
             }
         }
 
-        for (int a = 0; a < hiddenNNum + 1; a++) {
+        for (int a = 0; a <=hiddenNNum; a++) {
             for (int b = 0; b < outputNNum; b++) {
                 weightsHiddenToOutput[a][b] = 0;
             }
@@ -292,7 +293,7 @@ public class NeuralNetwork {
 
             correctClassification = true;
 
-            for (int j = 0; j < outputNNum && correctClassification == true; j++) {
+            for (int j = 0; j < outputNNum; j++) {
                 if (postProcessingOut(outputNeurons[j]) != set.get(i).target[j]) {
                     correctClassification = false;
                 }
@@ -360,9 +361,9 @@ public class NeuralNetwork {
         if (x >= 0.7) {
             return 1;
         }
-        if (x < 0.3) {
+        if (x <= 0.3) {
             return 0;
-        }
+        }else
         return -1;
     }
 
@@ -398,15 +399,15 @@ public class NeuralNetwork {
     public void runEpoch(ArrayList<DataRecord> trainingSet) {
         double errorClassifications = 0.0;
         double meanSqError = 0.0;
-        boolean correctClassification = true;
+       
 
         for (int x = 0; x < trainingSet.size(); x++) {
             feedForward(trainingSet.get(x).pattern);
             backProgagation(trainingSet.get(x).target);
 
-            correctClassification = true;
+            boolean correctClassification = true;
 
-            for (int y = 0; y < outputNNum && correctClassification == true; y++) {
+            for (int y = 0; y < outputNNum; y++) {
                 if (postProcessingOut(outputNeurons[y]) != trainingSet.get(x).target[y]) {
                     correctClassification = false;
                 }
@@ -430,7 +431,7 @@ public class NeuralNetwork {
     private void updateWeights() {
         for (int a = 0; a <= inputNNum; a++) {
             for (int b = 0; b < hiddenNNum; b++) {
-                weightsInputToHidden[a][b] = weightsHiddenToOutput[a][b] + deltaChangeWeightsInputToHidden[a][b];
+                weightsInputToHidden[a][b] = weightsInputToHidden[a][b] + deltaChangeWeightsInputToHidden[a][b];
 
                 if (batchLearning == true) {
                     deltaChangeWeightsInputToHidden[a][b] = 0;
@@ -452,10 +453,10 @@ public class NeuralNetwork {
     private void backProgagation(double[] targetPattern) {
 
         for (int i = 0; i < outputNNum; i++) {
-            outputErrorGradients[i] = 0;
+            outputErrorGradients[i] = getOutputErrorGradient(targetPattern[i],outputNeurons[i]);
 
             for (int j = 0; j <= hiddenNNum; j++) {
-                if (batchLearning == true) {
+                if (batchLearning == false) {
                     deltaChangeWeightsHiddenToOutput[j][i] = learningRate * hiddenNeurons[j] * outputErrorGradients[i] + momentum * deltaChangeWeightsHiddenToOutput[j][i];
                 } else {
                     deltaChangeWeightsHiddenToOutput[j][i] = deltaChangeWeightsHiddenToOutput[j][i] + learningRate * hiddenNeurons[j] * outputErrorGradients[i];
@@ -464,8 +465,9 @@ public class NeuralNetwork {
         }
 
         for (int x = 0; x < hiddenNNum; x++) {
+            hiddenErrorGradients[x] = getHiddenErrorGradient(x);
             for (int y = 0; y <= inputNNum; y++) {
-                if (batchLearning == true) {
+                if (batchLearning == false) {
                     deltaChangeWeightsInputToHidden[y][x] = learningRate * inputNeurons[y] * hiddenErrorGradients[x] + momentum * deltaChangeWeightsInputToHidden[y][x];
                 } else {
                     deltaChangeWeightsInputToHidden[y][x] = deltaChangeWeightsInputToHidden[y][x] + learningRate * inputNeurons[y] * hiddenErrorGradients[x];
