@@ -58,7 +58,7 @@ public class NetworkTrainer {
         }
     }
 
-    void RunExperiment(String fn, int inputs, int targets, String search, int experiment) throws IOException {
+    void RunExperiment(String fn, int inputs, int targets, String search, int experiment,boolean batch) throws IOException {
         DataReader dataInput = new DataReader();
         
         
@@ -68,7 +68,7 @@ public class NetworkTrainer {
         dataInput.loadFileExperiment(fn, inputs, targets, search, experiment);
         while (i < 1) {
             if (pokemon!=null) pokemon=null;
-            pokemon=new NeuralNetwork(16, hiddenUnits, 1, false);
+            pokemon=new NeuralNetwork(16, hiddenUnits, 1, batch);
             dataInput.reshuffleAndGenerateSets();
             trainNetwork(dataInput.trainingSet, dataInput.generalisationSet, dataInput.validationSet, logNumber);
 
@@ -98,7 +98,7 @@ public class NetworkTrainer {
 
         pokemon.setEpoch(0);
 
-        while ((pokemon.getTrainingSetAccuracy() < pokemon.getDesiredAccuracy() && pokemon.getGeneralisationSetAccuracy() < pokemon.getDesiredAccuracy()) && pokemon.getEpoch() < pokemon.getMaxEpochs()) {
+        while (( pokemon.getSetMeanSqError(validationSet)>pokemon.getDesiredMSEAccuracy()|| pokemon.getTrainingsetMeanSqError()>pokemon.getDesiredMSEAccuracy())&&(pokemon.getTrainingSetAccuracy() < pokemon.getDesiredAccuracy() || pokemon.getGeneralisationSetAccuracy() < pokemon.getDesiredAccuracy()) && pokemon.getEpoch() < pokemon.getMaxEpochs()) {
 
             double priorTrainingAcc = pokemon.getTrainingSetAccuracy();
             double priorGenAcc = pokemon.getGeneralisationSetAccuracy();

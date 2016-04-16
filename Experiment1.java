@@ -31,8 +31,9 @@ public class Experiment1 {
         letter=br.readLine();
         letter=letter.toUpperCase();
         
-        NetworkTrainer trainer1=new NetworkTrainer(16,1,1,false);
-        trainer1.RunExperiment("letter-recognition.data", 16, 1, letter, 0);
+        NetworkTrainer trainer1=new NetworkTrainer(16,1,1,true);
+        boolean useBatch=false;
+        trainer1.RunExperiment("letter-recognition.data", 16, 1, letter, 0,useBatch);
         
         double test[]={2,1,3,1,1,8,6,6,6,6,5,9,1,7,5,10};
         

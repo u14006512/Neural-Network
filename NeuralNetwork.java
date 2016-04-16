@@ -14,10 +14,11 @@ import java.util.ArrayList;
  */
 public class NeuralNetwork {
 
-    final double LEARNING_RATE_DEFAULT = 0.001;
+    final double LEARNING_RATE_DEFAULT = 0.5;
     final double MOMENTUM = 0.8;
     final long MAX_EPOCHS = 1500;
     final long PREFERED_ACCURACY = 100;
+    final double DESIRED_MSE=0.0001;
 
     ///LEARNING PARAMETERS
     double learningRate;
@@ -27,6 +28,7 @@ public class NeuralNetwork {
     long maxEpochs;
 
     double desiredAccuracy;
+    double desiredMSEAccuracy;
 
     double[][] deltaChangeWeightsInputToHidden;
     double[][] deltaChangeWeightsHiddenToOutput;
@@ -84,6 +86,9 @@ public class NeuralNetwork {
 
     double getDesiredAccuracy() {
         return desiredAccuracy;
+    }
+    double getDesiredMSEAccuracy() {
+        return desiredMSEAccuracy;
     }
 
     double getTrainingSetAccuracy() {
@@ -241,6 +246,7 @@ public class NeuralNetwork {
         momentum = MOMENTUM;
         maxEpochs = MAX_EPOCHS;
         desiredAccuracy = PREFERED_ACCURACY;
+        desiredMSEAccuracy=DESIRED_MSE;
         initWeights();
     }
 
@@ -459,7 +465,7 @@ public class NeuralNetwork {
                 if (batchLearning == false) {
                     deltaChangeWeightsHiddenToOutput[j][i] = learningRate * hiddenNeurons[j] * outputErrorGradients[i] + momentum * deltaChangeWeightsHiddenToOutput[j][i];
                 } else {
-                    deltaChangeWeightsHiddenToOutput[j][i] = deltaChangeWeightsHiddenToOutput[j][i] + learningRate * hiddenNeurons[j] * outputErrorGradients[i];
+                    deltaChangeWeightsHiddenToOutput[j][i] +=learningRate * hiddenNeurons[j] * outputErrorGradients[i];
                 }
             }
         }
@@ -470,7 +476,7 @@ public class NeuralNetwork {
                 if (batchLearning == false) {
                     deltaChangeWeightsInputToHidden[y][x] = learningRate * inputNeurons[y] * hiddenErrorGradients[x] + momentum * deltaChangeWeightsInputToHidden[y][x];
                 } else {
-                    deltaChangeWeightsInputToHidden[y][x] = deltaChangeWeightsInputToHidden[y][x] + learningRate * inputNeurons[y] * hiddenErrorGradients[x];
+                    deltaChangeWeightsInputToHidden[y][x] +=learningRate * inputNeurons[y] * hiddenErrorGradients[x];
                 }
             }
         }
