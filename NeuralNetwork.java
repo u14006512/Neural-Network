@@ -17,7 +17,7 @@ public class NeuralNetwork {
     final double LEARNING_RATE_DEFAULT = 0.5;
     final double MOMENTUM = 0.8;
     final long MAX_EPOCHS = 1500;
-    final long PREFERED_ACCURACY = 100;
+    final long PREFERED_ACCURACY = 99;
     final double DESIRED_MSE=0.0001;
 
     ///LEARNING PARAMETERS
